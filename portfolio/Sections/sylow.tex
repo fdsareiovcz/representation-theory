@@ -1,0 +1,365 @@
+\subsection{GAP によるシローの定理の確認}
+
+\subsubsection{目的}
+
+有限群に関するシローの定理について、
+GAP を用いて具体的な計算を行う。
+
+特に、対称群 $S_3$ と $S_4$ についてシロー部分群を計算し、
+シローの定理に現れる条件を確認する。
+
+\subsubsection{数学的背景}
+
+$G$ を有限群とし、その位数を
+
+\[
+|G|=p^n m
+\]
+
+とする。ただし $p$ は素数で、
+$p\nmid m$ とする。
+
+このとき、$G$ の部分群 $P$ で
+
+\[
+|P|=p^n
+\]
+
+を満たすものをシロー $p$-部分群という。
+
+シローの定理によれば、次が成り立つ。
+
+\begin{enumerate}
+  \item シロー $p$-部分群が存在する。
+  \item 任意のシロー $p$-部分群は互いに共役である。
+  \item シロー $p$-部分群の個数 $n_p$ は
+  \[
+  n_p\equiv 1\pmod p
+  \]
+  および
+  \[
+  n_p\mid m
+  \]
+  を満たす。
+\end{enumerate}
+
+GAP を用いることで、実際にシロー部分群を構成し、
+その位数や個数、共役性などを調べることができる。
+
+\subsubsection{$S_3$ のシロー部分群}
+
+まず
+
+\[
+G=S_3
+\]
+
+を考える。
+
+その位数は
+
+\[
+|S_3|=6=2\cdot3
+\]
+
+である。
+
+したがって、$2$-シロー部分群の位数は $2$、
+$3$-シロー部分群の位数は $3$ である。
+
+GAP でこれらを計算する。
+
+\begin{lstlisting}[language={}]
+G := SymmetricGroup(3);
+
+P2 := SylowSubgroup(G, 2);
+P3 := SylowSubgroup(G, 3);
+
+Size(G);
+Size(P2);
+Size(P3);
+\end{lstlisting}
+
+実行結果は次のようになる。
+
+\begin{lstlisting}
+6
+2
+3
+\end{lstlisting}
+
+したがって、
+
+\[
+|P_2|=2,\qquad |P_3|=3
+\]
+
+であり、それぞれ実際にシロー部分群になっていることが分かる。
+
+\subsubsection{シロー部分群の個数}
+
+次に、シロー部分群が何個存在するかを調べる。
+
+GAP では、シロー部分群をすべて求めるために
+\verb|ConjugacyClassesSubgroups| などを利用できる。
+
+ここでは、$S_3$ のすべての部分群を調べ、
+その位数からシロー部分群を取り出す。
+
+\begin{lstlisting}[language={}]
+G := SymmetricGroup(3);
+
+subs := AllSubgroups(G);
+
+p2subs := Filtered(subs, H -> Size(H) = 2);
+p3subs := Filtered(subs, H -> Size(H) = 3);
+
+Length(p2subs);
+Length(p3subs);
+\end{lstlisting}
+
+この結果、
+
+\begin{lstlisting}
+3
+1
+\end{lstlisting}
+
+が得られる。
+
+したがって、
+
+\[
+n_2=3,\qquad n_3=1
+\]
+
+である。
+
+\subsubsection{シローの定理との比較}
+
+$S_3$ の場合、
+
+\[
+|S_3|=6=2\cdot3
+\]
+
+なので、$p=2$ の場合には
+
+\[
+n_2\mid3,
+\qquad
+n_2\equiv1\pmod2
+\]
+
+である。
+
+実際、
+
+\[
+n_2=3
+\]
+
+なので、両方の条件を満たしている。
+
+$p=3$ の場合には、
+
+\[
+n_3\mid2,
+\qquad
+n_3\equiv1\pmod3
+\]
+
+である。
+
+実際、
+
+\[
+n_3=1
+\]
+
+なので、こちらも両方の条件を満たしている。
+
+\subsubsection{$S_4$ のシロー部分群}
+
+次に、少し大きな群として
+
+\[
+G=S_4
+\]
+
+を考える。
+
+その位数は
+
+\[
+|S_4|=24=2^3\cdot3
+\]
+
+である。
+
+したがって、$2$-シロー部分群の位数は
+
+\[
+2^3=8
+\]
+
+であり、$3$-シロー部分群の位数は
+
+\[
+3
+\]
+
+である。
+
+GAP で計算する。
+
+\begin{lstlisting}[language={}]
+G := SymmetricGroup(4);
+
+P2 := SylowSubgroup(G, 2);
+P3 := SylowSubgroup(G, 3);
+
+Size(G);
+Size(P2);
+Size(P3);
+\end{lstlisting}
+
+実行結果は
+
+\begin{lstlisting}
+24
+8
+3
+\end{lstlisting}
+
+となる。
+
+したがって、
+
+\[
+|P_2|=8,\qquad |P_3|=3
+\]
+
+である。
+
+\subsubsection{$S_4$ におけるシロー部分群の個数}
+
+$S_4$ についてシロー部分群の個数を調べる。
+
+GAP では、シロー部分群の共役類を調べることができる。
+
+\begin{lstlisting}[language={}]
+G := SymmetricGroup(4);
+
+P2 := SylowSubgroup(G, 2);
+P3 := SylowSubgroup(G, 3);
+
+ConjugacyClassSubgroups(G, P2);
+ConjugacyClassSubgroups(G, P3);
+\end{lstlisting}
+
+さらに、その共役類に含まれる部分群の個数を調べる。
+
+\begin{lstlisting}[language={}]
+Size(ConjugacyClassSubgroups(G, P2));
+Size(ConjugacyClassSubgroups(G, P3));
+\end{lstlisting}
+
+これにより、シロー $2$-部分群とシロー $3$-部分群の個数を計算できる。
+
+$S_4$ では
+
+\[
+n_2=3,\qquad n_3=4
+\]
+
+となる。
+
+実際、
+
+\[
+n_2\mid3,\qquad n_2\equiv1\pmod2
+\]
+
+および
+
+\[
+n_3\mid8,\qquad n_3\equiv1\pmod3
+\]
+
+を満たしている。
+
+\subsubsection{GAP で確認できること}
+
+今回の計算では、GAP を使って
+
+\begin{itemize}
+  \item シロー部分群を構成する。
+  \item シロー部分群の位数を計算する。
+  \item シロー部分群の個数を調べる。
+  \item シロー部分群の共役性を調べる。
+\end{itemize}
+
+ことができた。
+
+例えば $S_4$ では、
+
+\[
+|S_4|=24=2^3\cdot3
+\]
+
+に対して、
+
+\[
+|P_2|=8,\qquad |P_3|=3
+\]
+
+となり、シロー部分群の位数が理論から予想される値と一致する。
+
+また、その個数について
+
+\[
+n_2=3,\qquad n_3=4
+\]
+
+となり、それぞれシローの定理の条件
+
+\[
+n_p\equiv1\pmod p,
+\qquad
+n_p\mid\frac{|G|}{p^n}
+\]
+
+を満たしていることが確認できる。
+
+\subsubsection{まとめ}
+
+GAP を用いることで、シローの定理を具体的な有限群について計算機上で確認することができた。
+
+特に、
+
+\[
+S_3,\qquad S_4
+\]
+
+についてシロー部分群を実際に構成し、
+
+\[
+|P|=p^n
+\]
+
+という位数の条件や、シロー部分群の個数に関する条件を確認した。
+
+ラグランジュの定理では部分群の位数と群の位数の関係を調べたが、
+シローの定理ではさらに素数 $p$ に着目することで、
+有限群の部分群構造についてより具体的な情報を得ることができる。
+
+\subsubsection{使用したもの}
+
+\begin{itemize}
+  \item GAP
+  \item 有限群論
+  \item ラグランジュの定理
+  \item シローの定理
+  \item シロー部分群
+\end{itemize}
