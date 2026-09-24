@@ -1,0 +1,403 @@
+% !TEX program = lualatex
+\documentclass[a4paper,11pt]{ltjsarticle}
+
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\geometry{margin=25mm}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  keepspaces=true
+}
+
+\title{線形写像の核・像と次元定理\\
+\large GAPを使った計算例}
+\author{ecsm}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{問題}
+
+線形写像
+\[
+ f:\mathbb{R}^3\longrightarrow\mathbb{R}^2,\qquad
+ f(x)=Ax,
+\]
+を
+\[
+ A=
+ \begin{pmatrix}
+  1&2&1\\
+  2&1&3
+ \end{pmatrix}
+\]
+で定める。
+
+ここでは通常の線形代数の教科書と同様に、ベクトルを列ベクトルとして表す。
+
+\begin{enumerate}
+  \item $\ker f$ を求めよ。
+  \item $\operatorname{Im}f$ を求めよ。
+  \item
+  \[
+    \dim\mathbb{R}^3
+    =
+    \dim\ker f+\dim\operatorname{Im}f
+  \]
+  を確認せよ。
+\end{enumerate}
+
+\section*{1. 核を求める}
+
+$Ax=0$ を解く。
+
+\[
+\begin{pmatrix}
+1&2&1\\
+2&1&3
+\end{pmatrix}
+\begin{pmatrix}
+x\\y\\z
+\end{pmatrix}
+=
+\begin{pmatrix}
+0\\0
+\end{pmatrix}.
+\]
+
+これは
+\[
+\begin{cases}
+x+2y+z=0,\\
+2x+y+3z=0
+\end{cases}
+\]
+と同値である。
+
+第2式から第1式の2倍を引くと
+\[
+-3y+z=0,
+\]
+したがって $z=3y$ である。また
+\[
+x+2y+3y=0
+\]
+より $x=-5y$ となる。
+
+よって
+\[
+(x,y,z)=y(-5,1,3)
+\]
+であり、
+\[
+\boxed{\ker f=\operatorname{span}\{(-5,1,3)\}}.
+\]
+
+したがって
+\[
+\dim\ker f=1.
+\]
+
+\section*{2. 像を求める}
+
+行列 $A$ の列ベクトルは
+\[
+\begin{pmatrix}1\\2\end{pmatrix},
+\quad
+\begin{pmatrix}2\\1\end{pmatrix},
+\quad
+\begin{pmatrix}1\\3\end{pmatrix}
+\]
+である。
+
+第1列と第2列からなる行列
+\[
+\begin{pmatrix}
+1&2\\
+2&1
+\end{pmatrix}
+\]
+の行列式は
+\[
+1\cdot1-2\cdot2=-3\neq0.
+\]
+したがって第1列と第2列は一次独立であり、
+\[
+\operatorname{Im}f=\mathbb{R}^2.
+\]
+
+よって
+\[
+\boxed{\dim\operatorname{Im}f=2}.
+\]
+
+\section*{3. 次元定理の確認}
+
+以上から
+\[
+\dim\ker f+\dim\operatorname{Im}f
+=1+2=3.
+\]
+一方、
+\[
+\dim\mathbb{R}^3=3.
+\]
+したがって
+\[
+\boxed{
+\dim\mathbb{R}^3
+=
+\dim\ker f+\dim\operatorname{Im}f
+}.
+\]
+
+これは線形写像に対する
+\[
+\boxed{\dim V=\dim\ker f+\dim\operatorname{Im}f}
+\]
+という次元定理の具体例になっている。
+
+\section*{4. GAPで計算する}
+
+ここでは、通常の線形代数とGAPでのベクトルの表現の違いに注意する。
+
+数学ではベクトルを列ベクトルとして
+\[
+x=
+\begin{pmatrix}
+x_1\\x_2\\x_3
+\end{pmatrix}
+\]
+と表し、線形写像は
+\[
+Ax
+\]
+と書く。
+
+一方、GAPではベクトルを行リストとして扱う。
+したがって、GAPでは
+\[
+[x_1,x_2,x_3]
+\]
+という形でベクトルを表し、対応する線形写像は転置行列を右から掛ける形
+\[
+[x_1,x_2,x_3]A^{\mathsf T}
+\]
+で表すことができる。
+
+ここで
+\[
+A^{\mathsf T}
+=
+\begin{pmatrix}
+1&2\\
+2&1\\
+1&3
+\end{pmatrix}
+\]
+なので、
+\[
+[x_1,x_2,x_3]A^{\mathsf T}
+=
+[x_1+2x_2+x_3,\,
+  2x_1+x_2+3x_3].
+\]
+
+これは数学での
+\[
+A
+\begin{pmatrix}
+x_1\\x_2\\x_3
+\end{pmatrix}
+\]
+と同じ線形写像を表している。
+
+\subsection*{4.1 行列をGAPに入力する}
+
+まず、数学で使っている行列 $A$ をGAPに入力する。
+
+\begin{lstlisting}
+gap> A := [[1,2,1],[2,1,3]];;
+\end{lstlisting}
+
+GAPで行列のランクを計算すると、
+
+\begin{lstlisting}
+gap> RankMat(A);
+2
+\end{lstlisting}
+
+となる。
+
+したがって
+\[
+\operatorname{rank}(A)=2
+\]
+であり、
+\[
+\dim\ker f
+=3-\operatorname{rank}(A)
+=1
+\]
+である。
+
+\subsection*{4.2 核の計算}
+
+GAPでは、行列 $A$ の右核（right nullspace）を考えることで、
+\[
+xA^{\mathsf T}=0
+\]
+を満たす行ベクトル $x$ を求めることができる。
+
+\begin{lstlisting}
+gap> AT := TransposedMat(A);;
+gap> NullspaceMat(AT);
+[ [ -5, 1, 3 ] ]
+\end{lstlisting}
+
+したがって
+\[
+[-5,1,3]
+\]
+が核の基底に対応する。
+
+これは数学での列ベクトル
+\[
+\begin{pmatrix}
+-5\\1\\3
+\end{pmatrix}
+\]
+に対応しているので、
+\[
+\boxed{\ker f
+=\operatorname{span}\{(-5,1,3)\}}
+\]
+がGAPでも確認できる。
+
+\subsection*{4.3 像の計算}
+
+数学では $\operatorname{Im}f$ は $A$ の列空間である。
+
+GAPでは、$A$ の列を行ベクトルとして扱うために転置を利用する。
+すなわち、$A^{\mathsf T}$ の行空間を考える。
+
+\begin{lstlisting}
+gap> BaseMat(AT);
+[ [ 1, 2 ], [ 2, 1 ] ]
+\end{lstlisting}
+
+この2本は
+\[
+(1,2),\qquad(2,1)
+\]
+に対応し、数学での像の基底
+\[
+\begin{pmatrix}1\\2\end{pmatrix},
+\qquad
+\begin{pmatrix}2\\1\end{pmatrix}
+\]
+を与える。
+
+したがって
+\[
+\boxed{\operatorname{Im}f=\mathbb R^2}
+\]
+であり、
+\[
+\dim\operatorname{Im}f=2
+\]
+である。
+
+\section*{5. 手計算とGAPの対応}
+
+この例では、数学での列ベクトルとGAPでの行ベクトルを次のように対応させることができる。
+
+\[
+\begin{array}{c|c}
+\text{線形代数} & \text{GAP}\\ \hline
+x\in\mathbb R^3\text{（列ベクトル）}
+&
+[x_1,x_2,x_3]\text{（行リスト）}
+\\[2mm]
+Ax
+&
+xA^{\mathsf T}
+\\[2mm]
+\ker f
+&
+\texttt{NullspaceMat(TransposedMat(A))}
+\\[2mm]
+\operatorname{Im}f
+&
+A^{\mathsf T}\text{ の行空間}
+\\[2mm]
+\dim\operatorname{Im}f
+&
+\texttt{RankMat(A)}
+\end{array}
+\]
+
+重要なのは、数学での定義そのものをGAPの表記に合わせて変更する必要はないということである。
+
+数学では通常通り列ベクトルを使い、
+\[
+f(x)=Ax
+\]
+と考える。
+GAPではその同じ線形写像を、行ベクトルと転置行列を使って
+\[
+xA^{\mathsf T}
+\]
+と表現すればよい。
+
+\section*{6. 次元定理をGAPで確認する}
+
+GAPで得られた結果は
+\[
+\operatorname{rank}(A)=2,
+\qquad
+\dim\ker f=1.
+\]
+
+また、$A$ は $2\times3$ 行列なので、
+\[
+\dim\operatorname{Im}f
+=\operatorname{rank}(A)
+=2.
+\]
+
+したがって
+\[
+\dim\ker f+\dim\operatorname{Im}f
+=1+2=3
+=\dim\mathbb R^3.
+\]
+
+よって、この具体例において次元定理
+\[
+\boxed{
+\dim V
+=
+\dim\ker f+\dim\operatorname{Im}f
+}
+\]
+が計算によって確認できた。
+
+\section*{まとめ}
+
+この例では、線形写像の核と像を手計算で求め、その結果をGAPでも確認した。
+
+GAPを使う際には、数学で通常用いる列ベクトルと、GAPで扱われる行ベクトルの違いに注意する必要がある。
+しかし、転置行列を用いれば両者を自然に対応させることができる。
+
+GAPによる計算は証明そのものを置き換えるものではない。
+一方で、具体例を計算することで、核・像・ランク・次元定理がどのように結び付いているかを確認することができる。
+
+\end{document}
