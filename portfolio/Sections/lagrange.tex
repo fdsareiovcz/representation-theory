@@ -1,0 +1,120 @@
+\subsection{GAP を用いたラグランジュの定理の確認}
+
+\subsubsection{目的}
+
+有限群について、ラグランジュの定理
+\[
+|H| \mid |G|
+\]
+を具体例を用いて確認する。
+
+ここでは GAP を用いて有限群 $G$ とその部分群 $H$ を生成し、
+それぞれの位数を計算する。
+
+\subsubsection{数学的背景}
+
+$G$ を有限群、$H$ をその部分群とする。
+
+ラグランジュの定理によれば、
+\[
+|G| = [G:H]|H|
+\]
+が成り立つ。
+
+したがって、
+\[
+|H| \mid |G|
+\]
+である。
+
+例えば、対称群 $S_3$ とその部分群
+\[
+H=\langle (1\,2)\rangle
+\]
+を考える。
+
+このとき
+\[
+|S_3|=6,\qquad |H|=2
+\]
+なので、
+\[
+6=3\cdot2
+\]
+となり、確かに
+\[
+2\mid6
+\]
+である。
+
+\subsubsection{GAP による計算}
+
+以下の GAP プログラムを用いる。
+
+\begin{lstlisting}[language={}]
+G := SymmetricGroup(3);
+H := Subgroup(G, [(1,2)]);
+
+Size(G);
+Size(H);
+Index(G,H);
+\end{lstlisting}
+
+この計算では、
+
+\begin{itemize}
+  \item $G=S_3$ を生成する。
+  \item $(1\,2)$ が生成する部分群 $H$ を作る。
+  \item $G$ と $H$ の位数を計算する。
+  \item $[G:H]$ を計算する。
+\end{itemize}
+
+実行すると、例えば次のような結果が得られる。
+
+\begin{lstlisting}
+6
+2
+3
+\end{lstlisting}
+
+したがって、
+
+\[
+|G|=6,\qquad |H|=2,\qquad [G:H]=3
+\]
+
+であり、
+
+\[
+|G|=[G:H]|H|=3\cdot2=6
+\]
+
+となっている。
+
+\subsubsection{確認したこと}
+
+この例では、GAP による計算から
+
+\[
+|H|\mid |G|
+\]
+
+が直接確認できた。
+
+また、単に割り切れることを確認するだけでなく、
+
+\[
+[G:H]=\frac{|G|}{|H|}
+\]
+
+という剰余類の個数との関係も計算によって確認できる。
+
+このように、GAP を用いることで、有限群についての基本的な定理を具体例を通して計算機上で確認することができる。
+
+\subsubsection{使用したもの}
+
+\begin{itemize}
+  \item GAP
+  \item 有限群論
+  \item ラグランジュの定理
+\end{itemize}
