@@ -1,0 +1,473 @@
+\documentclass[a4paper,11pt]{jsarticle}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\geometry{margin=25mm}
+
+\newtheorem{definition}{定義}[section]
+\newtheorem{proposition}[definition]{命題}
+\newtheorem{theorem}[definition]{定理}
+\newtheorem{example}[definition]{例}
+
+\lstset{
+basicstyle=\ttfamily\small,
+frame=single,
+columns=fullflexible
+}
+
+\title{GAPで確かめる：\
+$S_5$ はなぜ可解でないのか}
+\author{ecsm}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本稿では，有限群の計算システム GAP を用いて，対称群
+$S_5$ が可解群でないことを具体的に調べる．
+単に GAP のコマンドを実行するだけでなく，
+導来群・導来列と可解性の関係を説明し，
+最後に Galois 理論との関係にも触れる．
+これにより，
+
+$$
+\text{GAP}
+\longrightarrow
+\text{群論}
+\longrightarrow
+\text{可解群}
+\longrightarrow
+\text{Galois 理論}
+$$
+
+という数学的なつながりを，具体的な計算を通して見ることを目標とする．
+\end{abstract}
+
+\section{はじめに}
+
+大学で群論や Galois 理論を学んでいると，
+「$S_5$ は可解群ではない」という事実に出会うことがある．
+さらに Galois 理論では，この事実が5次方程式の
+「根号による解法」と関係している．
+
+しかし，
+
+\begin{quote}
+「実際に $S_5$ の何を計算すれば，
+可解でないことが分かるのだろうか？」
+\end{quote}
+
+という疑問を持つこともあるだろう．
+
+本稿では，有限群を計算するためのソフトウェア
+GAP (\textit{Groups Algorithms Programming}) を利用して，
+この問題を具体的に調べる．
+
+重要なのは，GAP による計算そのものだけではない．
+計算結果が群論のどの概念に対応しているのかを確認することである．
+
+\section{$S_5$ と可解群}
+
+\subsection{対称群 $S_5$}
+
+5個の元の置換全体からなる群を $S_5$ と書く．
+その位数は
+
+$$
+|S_5|=5!=120
+$$
+
+である．
+
+偶置換全体からなる部分群を交代群 $A_5$ と書く．
+したがって
+
+$$
+|A_5|=\frac{5!}{2}=60
+$$
+
+である．
+
+$A_5$ は $S_5$ の正規部分群であり，
+
+$$
+S_5/A_5\cong C_2
+$$
+
+が成り立つ．
+
+\subsection{導来群}
+
+群 $G$ の元 $x,y\in G$ に対して，
+
+$$
+[x,y]=xyx^{-1}y^{-1}
+$$
+
+を交換子と呼ぶ．
+
+交換子全体で生成される部分群を導来群といい，
+
+$$
+G'=[G,G]
+$$
+
+と書く．
+
+導来列を
+
+$$
+G^{(0)}=G,\qquad
+G^{(1)}=G',\qquad
+G^{(2)}=(G')',\quad\ldots
+$$
+
+によって定める．
+
+\begin{definition}
+有限群 $G$ が可解群 (solvable group) であるとは，
+ある $n$ に対して
+
+$$
+G^{(n)}=1
+$$
+
+となることである．
+\end{definition}
+
+したがって，導来列を計算することによって，
+群が可解であるかどうかを調べることができる．
+
+\section{GAPを使ってみる}
+
+ここからは実際に GAP を使う．
+
+まず対称群 $S_5$ を作る．
+
+\begin{lstlisting}
+G := SymmetricGroup(5);
+\end{lstlisting}
+
+群の位数を調べるには，
+
+\begin{lstlisting}
+Size(G);
+\end{lstlisting}
+
+と入力する．
+
+出力は
+
+\begin{lstlisting}
+120
+\end{lstlisting}
+
+となる．
+
+したがって，確かに
+
+$$
+|S_5|=120
+$$
+
+であることが計算によって確認できる．
+
+\subsection{交代群 $A_5$}
+
+交代群は次のように作ることができる．
+
+\begin{lstlisting}
+A := AlternatingGroup(5);
+Size(A);
+\end{lstlisting}
+
+結果は
+
+\begin{lstlisting}
+60
+\end{lstlisting}
+
+となる．
+
+したがって，
+
+$$
+|A_5|=60
+$$
+
+である．
+
+\section{$S_5$ の導来列を計算する}
+
+GAP には導来列を計算するための
+\texttt{DerivedSeries} という関数が用意されている．
+
+\begin{lstlisting}
+DerivedSeries(G);
+\end{lstlisting}
+
+これにより，$S_5$ の導来列を計算できる．
+
+また，導来群を直接計算するには，
+
+\begin{lstlisting}
+DerivedSubgroup(G);
+\end{lstlisting}
+
+とすればよい．
+
+実際に計算すると，
+
+$$
+S_5'=A_5
+$$
+
+となることが分かる．
+
+さらに $A_5$ について計算すると，
+
+\begin{lstlisting}
+DerivedSubgroup(A);
+\end{lstlisting}
+
+その結果は $A_5$ 自身になる．すなわち，
+
+$$
+A_5'=A_5
+$$
+
+である．
+
+したがって導来列は
+
+$$
+S_5
+\supset
+A_5
+\supset
+A_5
+\supset
+A_5
+\supset\cdots
+$$
+
+となり，恒等群 $1$ には到達しない．
+
+よって $S_5$ は可解群ではない．
+
+\section{なぜこれで非可解性が分かるのか}
+
+ここまでの計算を数学的に整理してみよう．
+
+まず，
+
+$$
+S_5'=A_5
+$$
+
+である．
+
+もし $S_5$ が可解ならば，その導来群 $A_5$ も可解でなければならない．
+しかし，
+
+$$
+A_5'=A_5
+$$
+
+なので，$A_5$ の導来列は
+
+$$
+A_5\supset A_5\supset A_5\supset\cdots
+$$
+
+となる．
+
+したがって導来列が恒等群に到達することはない．
+よって $A_5$ は可解ではなく，したがって $S_5$ も可解ではない．
+
+ここで重要なのは，
+
+\begin{quote}
+GAP が「非可解」という結論を魔法のように与えているのではない
+\end{quote}
+
+ということである．
+
+GAP は導来群を計算している．
+その計算結果を「可解群の定義」と組み合わせることによって，
+非可解性という数学的結論を得ている．
+
+% \section{$A_5$ と単純群}
+
+% $A_5$ の非可解性については，
+% 単純群という観点からも理解できる．
+
+% よく知られているように，$A_5$ は非可換単純群である．
+% したがって，その正規部分群は
+
+% $$
+% 1,\qquad A_5
+% $$
+
+% しか存在しない．
+
+% 一方，$A_5'$ は $A_5$ の正規部分群である．
+% また $A_5$ は非可換なので，
+
+% $$
+% A_5'\neq 1.
+% $$
+
+% 単純性から，
+
+% $$
+% A_5'=A_5
+% $$
+
+% が従う．
+
+% したがって，GAPで得られた
+
+% $$
+% A_5'=A_5
+% $$
+
+% という計算結果は，$A_5$ が非可換単純群であるという
+% 群論的事実とも一致している．
+
+\section{Galois 理論との関係}
+
+では，なぜ $S_5$ が可解群でないことが重要なのだろうか．
+
+その理由の一つが Galois 理論である．
+
+体 $K$ 上の多項式 $f(x)$ の分解体を $L$ とすると，
+Galois 群
+
+$$
+\operatorname{Gal}(L/K)
+$$
+
+を考えることができる．
+
+Galois 理論では，多項式が根号によって解けることと，
+その Galois 群が可解群であることとの間に深い関係がある．
+
+したがって，例えばある5次多項式 $f(x)$ について
+
+$$
+\operatorname{Gal}(L/K)\cong S_5
+$$
+
+であることが分かったとする．
+
+このとき，$S_5$ が可解群でないことから，
+$f(x)$ は根号によって解くことができない．
+
+ここで注意すべきなのは，
+
+\begin{quote}
+「5次方程式はすべて根号で解けない」
+\end{quote}
+
+という意味ではないことである．
+
+5次方程式の中にも，Galois 群が可解群であるものは存在する．
+重要なのは，その Galois 群が可解かどうかである．
+
+\section{GAPでさらに調べる}
+
+GAP には，群が可解かどうかを直接判定する関数もある．
+
+\begin{lstlisting}
+IsSolvableGroup(G);
+\end{lstlisting}
+
+この結果は
+
+\begin{lstlisting}
+false
+\end{lstlisting}
+
+となる．
+
+一方，
+
+\begin{lstlisting}
+IsSolvableGroup(A);
+\end{lstlisting}
+
+についても
+
+\begin{lstlisting}
+false
+\end{lstlisting}
+
+となる．
+
+これは便利な機能だが，ここまでに導来列を実際に計算しているので，
+なぜ結果が \texttt{false} になるのかも理解できる．
+
+このように，計算機による判定と数学的な定義を対応させて考えることが，
+GAP を使った群論の一つの面白さである．
+
+\section{まとめ}
+
+本稿では，GAPを用いて $S_5$ の可解性を調べた．
+
+重要な計算結果は
+
+$$
+S_5'=A_5,
+\qquad
+A_5'=A_5
+$$
+
+である．
+
+したがって導来列は
+
+$$
+S_5\supset A_5\supset A_5\supset\cdots
+$$
+
+となり，恒等群に到達しない．
+よって
+
+$$
+\boxed{S_5\text{ は可解群ではない}}
+$$
+
+ことが分かる．
+
+さらに，この事実は Galois 理論における
+多項式の根号による可解性ともつながっている．
+
+今回の例から分かるように，GAP は単なる計算機ではなく，
+
+$$
+\text{抽象的な群論}
+\quad\longleftrightarrow\quad
+\text{具体的な計算}
+$$
+
+を行き来するための道具として利用できる．
+
+% \section*{参考文献}
+
+% \begin{itemize}
+% \item The GAP Group,
+% \textit{GAP -- Groups, Algorithms, and Programming}.
+% \item Dummit and Foote,
+% \textit{Abstract Algebra}.
+% \item I. N. Herstein,
+% \textit{Topics in Algebra}.
+% \end{itemize}
+
+\end{document}
